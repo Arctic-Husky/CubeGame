@@ -119,8 +119,8 @@ public class PolygonGenerator : MonoBehaviour
         if (Block(x-1, y) == 0)
         {
             colVertices.Add(new Vector3(x, y - 1, 1));
-            colVertices.Add(new Vector3(x + 1, y, 1));
-            colVertices.Add(new Vector3(x + 1, y, 0));
+            colVertices.Add(new Vector3(x, y, 1));
+            colVertices.Add(new Vector3(x, y, 0));
             colVertices.Add(new Vector3(x, y - 1, 0));
 
             ColliderTriangles();
@@ -129,7 +129,7 @@ public class PolygonGenerator : MonoBehaviour
         }
 
         //Direita
-        if (Block(x+1, y - 1) == 0)
+        if (Block(x+1, y) == 0)
         {
             colVertices.Add(new Vector3(x + 1, y, 1));
             colVertices.Add(new Vector3(x + 1, y - 1, 1));
@@ -170,31 +170,39 @@ public class PolygonGenerator : MonoBehaviour
                     blocks[px, py] = 1;
                 }
 
+                if(px == 5)
+                {
+                    blocks[px, py] = 0;
+                }
+
             }
         }
     }
 
     private void GenSquare(float x, float y, Vector2 texture)
     {
-        newVertices.Add(new Vector3(x, y, 0)); // Canto superior esquerdo
-        newVertices.Add(new Vector3(x + 1, y, 0)); // Canto superior direito
-        newVertices.Add(new Vector3(x + 1, y - 1, 0)); // Canto inferior direito
-        newVertices.Add(new Vector3(x, y - 1, 0)); // Canto inferior esquerdo
+        if(Block((int)x, (int)y + 1) == 0 || Block((int)x, (int)y - 1) == 0 || Block((int)x+1, (int)y) == 0 || Block((int)x-1, (int)y) == 0) // se tiver contato com o ar
+        {
+            newVertices.Add(new Vector3(x, y, 0)); // Canto superior esquerdo
+            newVertices.Add(new Vector3(x + 1, y, 0)); // Canto superior direito
+            newVertices.Add(new Vector3(x + 1, y - 1, 0)); // Canto inferior direito
+            newVertices.Add(new Vector3(x, y - 1, 0)); // Canto inferior esquerdo
 
-        newTriangles.Add((squareCount*4) + 0);
-        newTriangles.Add((squareCount * 4) + 1);
-        newTriangles.Add((squareCount * 4) + 3);
-        newTriangles.Add((squareCount * 4) + 1);
-        newTriangles.Add((squareCount * 4) + 2);
-        newTriangles.Add((squareCount * 4) + 3);
+            newTriangles.Add((squareCount * 4) + 0);
+            newTriangles.Add((squareCount * 4) + 1);
+            newTriangles.Add((squareCount * 4) + 3);
+            newTriangles.Add((squareCount * 4) + 1);
+            newTriangles.Add((squareCount * 4) + 2);
+            newTriangles.Add((squareCount * 4) + 3);
 
-        // Indicando os 4 cantos da textura (coordenadas) que 
-        newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texture.x + tUnit, tUnit * texture.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texture.x + tUnit, tUnit * texture.y));
-        newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y));
+            // Indicando os 4 cantos da textura (coordenadas) que 
+            newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y + tUnit));
+            newUV.Add(new Vector2(tUnit * texture.x + tUnit, tUnit * texture.y + tUnit));
+            newUV.Add(new Vector2(tUnit * texture.x + tUnit, tUnit * texture.y));
+            newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y));
 
-        squareCount++;
+            squareCount++;
+        }
     }
 
     private void UpdateMesh()
