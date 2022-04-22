@@ -50,7 +50,6 @@ public class PolygonGenerator : MonoBehaviour
 
         UpdateMesh();
     }
-
     private void BuildMesh()
     {
         for (int px = 0; px < blocks.GetLength(0); px++)
@@ -154,25 +153,39 @@ public class PolygonGenerator : MonoBehaviour
 
     private void GenTerrain()
     {
-        blocks = new byte[10, 10];
+        blocks = new byte[96, 128];
 
         // cria um grid maior parte um tipo e linha 0 outro tipo
         for(int px=0; px < blocks.GetLength(0); px++)
         {
+            int stone = Noise(px, 0, 80, 15, 1);
+            stone += Noise(px, 0, 50, 30, 1);
+            stone += Noise(px, 0, 10, 10, 1);
+            stone += 75;
+
+            int dirt = Noise(px, 0, 100, 35, 1);
+            dirt += Noise(px, 0, 50, 30, 1);
+            dirt += 75;
+
             for(int py = 0; py < blocks.GetLength(1); py++)
             {
-                if(py == 5)
-                {
-                    blocks[px, py] = 2;
-                }
-                else if(py < 5)
+                if(py < stone)
                 {
                     blocks[px, py] = 1;
-                }
 
-                if(px == 5)
+                    if (Noise(px, py, 12, 16, 1) > 10) // terra no lugar de algumas pedras
+                    {
+                        blocks[px, py] = 2;
+                    }
+
+                    if(Noise(px,py*2,16,14,1) > 10) // cavernas
+                    {
+                        blocks[px, py] = 0;
+                    }
+                }
+                else if(py < dirt)
                 {
-                    blocks[px, py] = 0;
+                    blocks[px, py] = 2;
                 }
 
             }
@@ -181,8 +194,8 @@ public class PolygonGenerator : MonoBehaviour
 
     private void GenSquare(float x, float y, Vector2 texture)
     {
-        if(Block((int)x, (int)y + 1) == 0 || Block((int)x, (int)y - 1) == 0 || Block((int)x+1, (int)y) == 0 || Block((int)x-1, (int)y) == 0) // se tiver contato com o ar
-        {
+        //if(Block((int)x, (int)y + 1) == 0 || Block((int)x, (int)y - 1) == 0 || Block((int)x+1, (int)y) == 0 || Block((int)x-1, (int)y) == 0) // se tiver contato com o ar
+        //{
             newVertices.Add(new Vector3(x, y, 0)); // Canto superior esquerdo
             newVertices.Add(new Vector3(x + 1, y, 0)); // Canto superior direito
             newVertices.Add(new Vector3(x + 1, y - 1, 0)); // Canto inferior direito
@@ -202,7 +215,7 @@ public class PolygonGenerator : MonoBehaviour
             newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y));
 
             squareCount++;
-        }
+        //}
     }
 
     private void UpdateMesh()
@@ -227,5 +240,10 @@ public class PolygonGenerator : MonoBehaviour
         colVertices.Clear();
         colTriangles.Clear();
         colCount = 0;
+    }
+
+    int Noise(int x, int y, float scale, float mag, float exp)
+    {
+        return (int)(Mathf.Pow((Mathf.PerlinNoise(x / scale, y / scale) * mag), (exp)));
     }
 }
